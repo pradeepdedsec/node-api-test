@@ -8,7 +8,7 @@ const app = express();
 
 // Use CORS with specific origin and credentials enabled
 app.use(cors({
-    origin: 'http://localhost:3000', // Allow only requests from this origin
+    origin: 'https://react-test-9fsi.onrender.com', // Allow only requests from this origin
     credentials: true                // Allow credentials
 }));
 
