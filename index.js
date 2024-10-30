@@ -1,47 +1,46 @@
 const express = require("express");
+const dotenv = require('dotenv').config();
+const cors = require('cors');
+const bodyParser = require("body-parser");
+const mysql = require("mysql");
 
 const app = express();
 
-const dotenv=require('dotenv').config();
+// Use CORS middleware before defining routes
+app.use(cors()); // Enable CORS for all origins
 
-const cors=require('cors');
+// Enable JSON parsing and body parsing middleware
+app.use(express.json());
+app.use(bodyParser.json());
 
-const bodyParser=require("body-parser");
-
-const mysql=require("mysql");
-
-
-const db=mysql.createConnection({
-    user:process.env.DB_USER,
-    password:process.env.DB_PASS,
-    host:process.env.DB_HOST,
-    port:process.env.DB_PORT,  
-    database:process.env.DATABASE
+// Set up MySQL connection
+const db = mysql.createConnection({
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,  
+    database: process.env.DATABASE
 });
 
 db.connect();
 
-app.get("/",(req,res) =>{
-    db.query("select username from accounts where username='pradeepdedsec'",async (err,results) =>{
-        if(err){
+// Define routes
+app.get("/", (req, res) => {
+    db.query("select username from accounts where username='pradeepdedsec'", async (err, results) => {
+        if (err) {
             console.error(err);
             res.send("hello world");
+        } else {
+            res.send(JSON.stringify(results));
         }
-        res.send(JSON.stringify(results));
-    })
-    
+    });
 });
 
-
-app.get("/home",(req,res) =>{
+app.get("/home", (req, res) => {
     res.send("hello world");
 });
 
-
-app.use(express.json());
-app.use(bodyParser.json());
-app.use(cors());
-
-app.listen(3000,()=>{
+// Start server
+app.listen(3000, () => {
     console.log("server is running on port 3000");
 });
