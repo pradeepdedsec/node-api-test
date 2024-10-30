@@ -8,6 +8,30 @@ const cors=require('cors');
 
 const bodyParser=require("body-parser");
 
+const mysql=require("mysql");
+
+
+const db=mysql.createConnection({
+    user:process.env.DB_USER,
+    password:process.env.DB_PASS,
+    host:process.env.DB_HOST,
+    port:process.env.DB_PORT,  
+    database:process.env.DATABASE
+});
+
+db.connect();
+
+app.get("/",(req,res) =>{
+    db.query("select username from accounts where username='pradeepdedsec'",async (err,results) =>{
+        if(err){
+            console.error(err);
+            res.send("hello world");
+        }
+        res.send(JSON.stringify(results));
+    })
+    
+});
+
 
 app.get("/home",(req,res) =>{
     res.send("hello world");
