@@ -6,8 +6,11 @@ const mysql = require("mysql");
 
 const app = express();
 
-// Use CORS middleware before defining routes
-app.use(cors()); // Enable CORS for all origins
+// Use CORS with specific origin and credentials enabled
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow only requests from this origin
+    credentials: true                // Allow credentials
+}));
 
 // Enable JSON parsing and body parsing middleware
 app.use(express.json());
@@ -41,6 +44,6 @@ app.get("/home", (req, res) => {
 });
 
 // Start server
-app.listen(3000, () => {
+app.listen(5000, () => {
     console.log("server is running on port 3000");
 });
