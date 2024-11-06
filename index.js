@@ -2,48 +2,58 @@ const express = require("express");
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const bodyParser = require("body-parser");
-const mysql = require("mysql");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
-// Use CORS with specific origin and credentials enabled
+// Enable CORS with specific origin and credentials enabled
 app.use(cors({
-    origin: 'https://react-test-9fsi.onrender.com', // Allow only requests from this origin
-    credentials: true                // Allow credentials
-}));
+    origin: ['http://localhost:3000'], // Allow the React frontend's origin
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'], // Allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true, // Allow cookies to be sent
+  }));
 
 // Enable JSON parsing and body parsing middleware
 app.use(express.json());
 app.use(bodyParser.json());
-
-// Set up MySQL connection
-const db = mysql.createConnection({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,  
-    database: process.env.DATABASE
-});
-
-db.connect();
+app.use(cookieParser());
 
 // Define routes
-app.get("/", (req, res) => {
-    db.query("select username from accounts where username='pradeepdedsec'", async (err, results) => {
-        if (err) {
-            console.error(err);
-            res.send("hello world");
-        } else {
-            res.send(JSON.stringify(results));
-        }
+app.get("/home", (req, res) => {
+    res.cookie('collab', 'pradeep', { 
+        httpOnly: true, 
+        secure: false, // Set to true when using HTTPS
+        sameSite: 'None' // For cross-origin cookies
     });
+
+    res.json({cookie: 'pradeep', message: "hello world" });
 });
 
-app.get("/home", (req, res) => {
-    res.send("hello world");
+app.get("/", async (req, res) => {
+    console.log("Received request for /");
+    console.log("Cookies: ", req.cookies); // Log all cookies
+    const cookieValue = req.cookies.collab || "No cookie found";
+    console.log("Cookie value: ", cookieValue);
+    res.status(200).json({ message: cookieValue });
+});
+
+
+app.get("/hi", async (req, res) => {
+    console.log("hi");
+    const cookie = await req.cookies["collab"];
+    console.log(" hi :");
+    console.log(await cookie);
+    res.status(200).json({"cookie ":cookie});
+});
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
 
 // Start server
-app.listen(5000, () => {
-    console.log("server is running on port 3000");
+app.listen(5000,'0.0.0.0', () => {
+    console.log("Server is running on port 5000");
 });
